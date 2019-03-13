@@ -60,12 +60,6 @@ export default class DatePicker extends Component {
   }
 
   setOpen(isOpen) {
-
-    const { momentValue } = this.state;
-    if (momentValue && this.props.onChange) {
-        this.handleChange(momentValue);
-    }
-
     this.setState({ isOpen });
   }
 
@@ -90,35 +84,32 @@ export default class DatePicker extends Component {
 
   }
 
-  handleChange(value) {
-
-      if (!this.lastValueChange || !this.lastValueChange.valueOf) {
-          // console.log('change 1');
-          this.lastValueChange = value;
-          this.props.onChange(value);
-          return;
-      }
-
-      if (value.valueOf && value.valueOf() !== this.lastValueChange.valueOf()) {
-          // console.log('change 2');
-          this.lastValueChange = value;
-          this.props.onChange(value);
-      }
-
-  }
-
-  setMomentValue(momentValue, doChange) {
-    const { inputFormat, timePicker } = this.state;
-
-    if (doChange !== false && this.props.onChange) {
-      this.handleChange(momentValue);
+  handleChange() {
+    const {momentValue} = this.state;
+    if (!this.lastValueChange || !this.lastValueChange.valueOf) {
+      this.lastValueChange = momentValue;
+      this.props.onChange(momentValue);
+      this.close();
+      return;
     }
 
-    // const inputValue = momentValue.format(inputFormat);
+    if (momentValue.valueOf && momentValue.valueOf() !== this.lastValueChange.valueOf()) {
+      this.lastValueChange = momentValue;
+      this.props.onChange(momentValue);
+      this.close();
+    }
+  }
 
+  handleInputChangeOnEnter(event) {
+    if(event.key === 'Enter') {
+      return this.handleChange();
+    }
+  }
+
+  setMomentValue(momentValue) {
+    const {timePicker } = this.state;
     const inputValue = this.getValue(momentValue, timePicker);
-
-    this.setState({ momentValue, inputValue });
+    this.setState({ momentValue: moment(momentValue), inputValue });
   }
 
   handleFocus() {
@@ -127,22 +118,27 @@ export default class DatePicker extends Component {
 
   handleBlur(event) {
     const { onBlur } = this.props;
-    const { isOpen, momentValue, inputFormat } = this.state;
+    const { isOpen } = this.state;
 
     if (isOpen) {
       this.refs.input.focus();
-    } else if (onBlur) {
-      onBlur(event);
-    }
-
-    if (momentValue) {
-      const inputValue = momentValue.format(inputFormat);
-      this.setState({ inputValue });
+    } else {
+      this.close();
+      if (onBlur) {
+        onBlur(event);
+      }
     }
   }
 
-  handleClickOutsideCalendar() {
+  close() {
+    const { value } = this.props;
+    const { timePicker } = this.state;
+    this.setState({inputValue: this.getValue(value, timePicker)});
     this.setOpen(false);
+  }
+
+  handleClickOutsideCalendar() {
+    this.close();
   }
 
   handleSelectDay(selectedDay) {
@@ -192,6 +188,7 @@ export default class DatePicker extends Component {
           className={`datepicker-input ${className}`}
           type="text"
           ref="input"
+          onKeyUp={this.handleInputChangeOnEnter.bind(this)}
           onFocus={this.handleFocus.bind(this)}
           onBlur={this.handleBlur.bind(this)}
           onChange={this.handleInputChange.bind(this)}
@@ -204,7 +201,7 @@ export default class DatePicker extends Component {
 
   renderCalendar() {
     const { momentValue, timePickerComponent: TimePicker } = this.state;
-    const { onChange, min, max, defaultMonth, styles, calendarContainerProps } = this.props;
+    const { min, max, defaultMonth, styles, calendarContainerProps} = this.props;
 
     return (
       <div>
@@ -214,31 +211,32 @@ export default class DatePicker extends Component {
           selectedDay={momentValue}
           defaultMonth={defaultMonth}
           onSelect={this.handleSelectDay.bind(this)}
-          onClickOutside={this.handleClickOutsideCalendar.bind(this)}
+          onClickOutside={this.close.bind(this)}
           outsideClickIgnoreClass={outsideClickIgnoreClass}
           styles={styles}
           containerProps={calendarContainerProps}
         >
-          {
-            TimePicker ? (
-              <TimePicker
-                min={min}
-                max={max}
-                momentValue={momentValue}
-                setMomentValue={this.setMomentValue.bind(this)}
-              />
-            ) : null
-          }
+          <div className="picker-header">
+            <div className="save-button-container">
+              <button className="save-button" onClick={this.handleChange.bind(this)}>Save</button>
+            </div>
+            {
+              TimePicker ? (
+                <TimePicker
+                  min={min}
+                  max={max}
+                  momentValue={momentValue}
+                  setMomentValue={this.setMomentValue.bind(this)}
+                />
+              ) : <div className="time-picker-container"/>
+            }
+          </div>
         </Calendar>
       </div>
     );
   }
 
   removeDate() {
-    const { onChange } = this.props;
-    if (onChange) {
-      onChange('');
-    }
     this.setState({
       input: '',
       inputValue: ''

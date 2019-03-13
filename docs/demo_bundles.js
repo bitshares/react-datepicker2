@@ -6289,12 +6289,6 @@ var DatePicker = function (_Component) {
   }, {
     key: 'setOpen',
     value: function setOpen(isOpen) {
-      var momentValue = this.state.momentValue;
-
-      if (momentValue && this.props.onChange) {
-        this.handleChange(momentValue);
-      }
-
       this.setState({ isOpen: isOpen });
     }
   }, {
@@ -6322,36 +6316,28 @@ var DatePicker = function (_Component) {
   }, {
     key: 'handleChange',
     value: function handleChange(value) {
+      var momentValue = this.state.momentValue;
 
+      console.log('handle change');
       if (!this.lastValueChange || !this.lastValueChange.valueOf) {
         // console.log('change 1');
-        this.lastValueChange = value;
-        this.props.onChange(value);
+        this.lastValueChange = momentValue;
+        this.props.onChange(momentValue);
         return;
       }
 
       if (value.valueOf && value.valueOf() !== this.lastValueChange.valueOf()) {
         // console.log('change 2');
-        this.lastValueChange = value;
-        this.props.onChange(value);
+        this.lastValueChange = momentValue;
+        this.props.onChange(momentValue);
       }
     }
   }, {
     key: 'setMomentValue',
-    value: function setMomentValue(momentValue, doChange) {
-      var _state = this.state,
-          inputFormat = _state.inputFormat,
-          timePicker = _state.timePicker;
-
-
-      if (doChange !== false && this.props.onChange) {
-        this.handleChange(momentValue);
-      }
-
-      // const inputValue = momentValue.format(inputFormat);
+    value: function setMomentValue(momentValue) {
+      var timePicker = this.state.timePicker;
 
       var inputValue = this.getValue(momentValue, timePicker);
-
       this.setState({ momentValue: momentValue, inputValue: inputValue });
     }
   }, {
@@ -6362,17 +6348,23 @@ var DatePicker = function (_Component) {
   }, {
     key: 'handleBlur',
     value: function handleBlur(event) {
-      var onBlur = this.props.onBlur;
-      var _state2 = this.state,
-          isOpen = _state2.isOpen,
-          momentValue = _state2.momentValue,
-          inputFormat = _state2.inputFormat;
+      var _props = this.props,
+          value = _props.value,
+          defaultValue = _props.defaultValue,
+          onBlur = _props.onBlur;
+      var _state = this.state,
+          isOpen = _state.isOpen,
+          momentValue = _state.momentValue,
+          inputFormat = _state.inputFormat;
 
 
       if (isOpen) {
         this.refs.input.focus();
-      } else if (onBlur) {
-        onBlur(event);
+        this.setState({ inputValue: value || defaultValue });
+      } else {
+        if (onBlur) {
+          onBlur(event);
+        }
       }
 
       if (momentValue) {
@@ -6383,6 +6375,11 @@ var DatePicker = function (_Component) {
   }, {
     key: 'handleClickOutsideCalendar',
     value: function handleClickOutsideCalendar() {
+      var _props2 = this.props,
+          value = _props2.value,
+          defaultValue = _props2.defaultValue;
+
+      this.setState({ inputValue: value || defaultValue });
       this.setOpen(false);
     }
   }, {
@@ -6426,9 +6423,9 @@ var DatePicker = function (_Component) {
   }, {
     key: 'renderInput',
     value: function renderInput() {
-      var _state3 = this.state,
-          isOpen = _state3.isOpen,
-          inputValue = _state3.inputValue;
+      var _state2 = this.state,
+          isOpen = _state2.isOpen,
+          inputValue = _state2.inputValue;
 
 
       var className = (0, _classnames3.default)(this.props.className, (0, _defineProperty3.default)({}, outsideClickIgnoreClass, isOpen));
@@ -6451,16 +6448,15 @@ var DatePicker = function (_Component) {
   }, {
     key: 'renderCalendar',
     value: function renderCalendar() {
-      var _state4 = this.state,
-          momentValue = _state4.momentValue,
-          TimePicker = _state4.timePickerComponent;
-      var _props = this.props,
-          onChange = _props.onChange,
-          min = _props.min,
-          max = _props.max,
-          defaultMonth = _props.defaultMonth,
-          styles = _props.styles,
-          calendarContainerProps = _props.calendarContainerProps;
+      var _state3 = this.state,
+          momentValue = _state3.momentValue,
+          TimePicker = _state3.timePickerComponent;
+      var _props3 = this.props,
+          min = _props3.min,
+          max = _props3.max,
+          defaultMonth = _props3.defaultMonth,
+          styles = _props3.styles,
+          calendarContainerProps = _props3.calendarContainerProps;
 
 
       return _react2.default.createElement(
@@ -6479,23 +6475,31 @@ var DatePicker = function (_Component) {
             styles: styles,
             containerProps: calendarContainerProps
           },
-          TimePicker ? _react2.default.createElement(TimePicker, {
-            min: min,
-            max: max,
-            momentValue: momentValue,
-            setMomentValue: this.setMomentValue.bind(this)
-          }) : null
+          _react2.default.createElement(
+            'div',
+            { className: 'picker-header' },
+            _react2.default.createElement(
+              'div',
+              { className: 'save-button-container' },
+              _react2.default.createElement(
+                'button',
+                { className: 'save-button', onClick: this.handleChange.bind(this) },
+                'Save'
+              )
+            ),
+            TimePicker ? _react2.default.createElement(TimePicker, {
+              min: min,
+              max: max,
+              momentValue: momentValue,
+              setMomentValue: this.setMomentValue.bind(this)
+            }) : _react2.default.createElement('div', { className: 'time-picker-container' })
+          )
         )
       );
     }
   }, {
     key: 'removeDate',
     value: function removeDate() {
-      var onChange = this.props.onChange;
-
-      if (onChange) {
-        onChange('');
-      }
       this.setState({
         input: '',
         inputValue: ''

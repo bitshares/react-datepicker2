@@ -172,12 +172,20 @@
     color: #ffffff;
 }
 
+.picker-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.save-button-container {
+    flex: 1;
+}
+
 /*time picker style*/
 
 .time-picker-container {
-    margin-bottom: 10
+    flex: 3;
 }
-
 .time-picker-container>.time-label {
     float: left;
     line-height: 30px;
