@@ -25,7 +25,7 @@ At this point you can import react-datepicker2 and its styles in your applicatio
 import DatePicker from 'react-datepicker2';
 
 // Be sure to include styles at some point, probably during your bootstrapping
-import 'react-datepicker2/dist/react-datepicker2.min.css';
+import 'react-datepicker2/dist/react-datepicker2.css';
 ```
 
 Below is a simple example on how to use the Datepicker in a React view. You will also need to require the css file from this package (or provide your own). The example below shows how to include the css from this package if your build system supports requiring css files (webpack is one that does).
@@ -35,7 +35,7 @@ import React from 'react'
 import moment from 'moment-jalaali'
 import DatePicker from 'react-datepicker2';
 
-import 'react-datepicker2/dist/react-datepicker2.min.css';
+import 'react-datepicker2/dist/react-datepicker2.css';
 
 export default React.createClass({
   getInitialState() {

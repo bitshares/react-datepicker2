@@ -6629,12 +6629,6 @@ var DatePicker = function (_Component) {
   }, {
     key: 'setOpen',
     value: function setOpen(isOpen) {
-      var momentValue = this.state.momentValue;
-
-      if (momentValue && this.props.onChange) {
-        this.handleChange(momentValue);
-      }
-
       this.setState({ isOpen: isOpen });
     }
   }, {
@@ -6661,38 +6655,36 @@ var DatePicker = function (_Component) {
     }
   }, {
     key: 'handleChange',
-    value: function handleChange(value) {
+    value: function handleChange() {
+      var momentValue = this.state.momentValue;
 
       if (!this.lastValueChange || !this.lastValueChange.valueOf) {
-        // console.log('change 1');
-        this.lastValueChange = value;
-        this.props.onChange(value);
+        this.lastValueChange = momentValue;
+        this.props.onChange(momentValue);
+        this.close();
         return;
       }
 
-      if (value.valueOf && value.valueOf() !== this.lastValueChange.valueOf()) {
-        // console.log('change 2');
-        this.lastValueChange = value;
-        this.props.onChange(value);
+      if (momentValue.valueOf && momentValue.valueOf() !== this.lastValueChange.valueOf()) {
+        this.lastValueChange = momentValue;
+        this.props.onChange(momentValue);
+        this.close();
+      }
+    }
+  }, {
+    key: 'handleInputChangeOnEnter',
+    value: function handleInputChangeOnEnter(event) {
+      if (event.key === 'Enter') {
+        return this.handleChange();
       }
     }
   }, {
     key: 'setMomentValue',
-    value: function setMomentValue(momentValue, doChange) {
-      var _state = this.state,
-          inputFormat = _state.inputFormat,
-          timePicker = _state.timePicker;
-
-
-      if (doChange !== false && this.props.onChange) {
-        this.handleChange(momentValue);
-      }
-
-      // const inputValue = momentValue.format(inputFormat);
+    value: function setMomentValue(momentValue) {
+      var timePicker = this.state.timePicker;
 
       var inputValue = this.getValue(momentValue, timePicker);
-
-      this.setState({ momentValue: momentValue, inputValue: inputValue });
+      this.setState({ momentValue: (0, _moment2.default)(momentValue), inputValue: inputValue });
     }
   }, {
     key: 'handleFocus',
@@ -6703,27 +6695,31 @@ var DatePicker = function (_Component) {
     key: 'handleBlur',
     value: function handleBlur(event) {
       var onBlur = this.props.onBlur;
-      var _state2 = this.state,
-          isOpen = _state2.isOpen,
-          momentValue = _state2.momentValue,
-          inputFormat = _state2.inputFormat;
+      var isOpen = this.state.isOpen;
 
 
       if (isOpen) {
         this.refs.input.focus();
-      } else if (onBlur) {
-        onBlur(event);
+      } else {
+        this.close();
+        if (onBlur) {
+          onBlur(event);
+        }
       }
+    }
+  }, {
+    key: 'close',
+    value: function close() {
+      var value = this.props.value;
+      var timePicker = this.state.timePicker;
 
-      if (momentValue) {
-        var inputValue = momentValue.format(inputFormat);
-        this.setState({ inputValue: inputValue });
-      }
+      this.setState({ inputValue: this.getValue(value, timePicker) });
+      this.setOpen(false);
     }
   }, {
     key: 'handleClickOutsideCalendar',
     value: function handleClickOutsideCalendar() {
-      this.setOpen(false);
+      this.close();
     }
   }, {
     key: 'handleSelectDay',
@@ -6766,9 +6762,9 @@ var DatePicker = function (_Component) {
   }, {
     key: 'renderInput',
     value: function renderInput() {
-      var _state3 = this.state,
-          isOpen = _state3.isOpen,
-          inputValue = _state3.inputValue;
+      var _state = this.state,
+          isOpen = _state.isOpen,
+          inputValue = _state.inputValue;
 
 
       var className = (0, _classnames3.default)(this.props.className, (0, _defineProperty3.default)({}, outsideClickIgnoreClass, isOpen));
@@ -6780,6 +6776,7 @@ var DatePicker = function (_Component) {
           className: 'datepicker-input ' + className,
           type: 'text',
           ref: 'input',
+          onKeyUp: this.handleInputChangeOnEnter.bind(this),
           onFocus: this.handleFocus.bind(this),
           onBlur: this.handleBlur.bind(this),
           onChange: this.handleInputChange.bind(this),
@@ -6791,11 +6788,10 @@ var DatePicker = function (_Component) {
   }, {
     key: 'renderCalendar',
     value: function renderCalendar() {
-      var _state4 = this.state,
-          momentValue = _state4.momentValue,
-          TimePicker = _state4.timePickerComponent;
+      var _state2 = this.state,
+          momentValue = _state2.momentValue,
+          TimePicker = _state2.timePickerComponent;
       var _props = this.props,
-          onChange = _props.onChange,
           min = _props.min,
           max = _props.max,
           defaultMonth = _props.defaultMonth,
@@ -6814,28 +6810,36 @@ var DatePicker = function (_Component) {
             selectedDay: momentValue,
             defaultMonth: defaultMonth,
             onSelect: this.handleSelectDay.bind(this),
-            onClickOutside: this.handleClickOutsideCalendar.bind(this),
+            onClickOutside: this.close.bind(this),
             outsideClickIgnoreClass: outsideClickIgnoreClass,
             styles: styles,
             containerProps: calendarContainerProps
           },
-          TimePicker ? _react2.default.createElement(TimePicker, {
-            min: min,
-            max: max,
-            momentValue: momentValue,
-            setMomentValue: this.setMomentValue.bind(this)
-          }) : null
+          _react2.default.createElement(
+            'div',
+            { className: 'picker-header' },
+            _react2.default.createElement(
+              'div',
+              { className: 'save-button-container' },
+              _react2.default.createElement(
+                'button',
+                { className: 'save-button', onClick: this.handleChange.bind(this) },
+                'Save'
+              )
+            ),
+            TimePicker ? _react2.default.createElement(TimePicker, {
+              min: min,
+              max: max,
+              momentValue: momentValue,
+              setMomentValue: this.setMomentValue.bind(this)
+            }) : _react2.default.createElement('div', { className: 'time-picker-container' })
+          )
         )
       );
     }
   }, {
     key: 'removeDate',
     value: function removeDate() {
-      var onChange = this.props.onChange;
-
-      if (onChange) {
-        onChange('');
-      }
       this.setState({
         input: '',
         inputValue: ''
