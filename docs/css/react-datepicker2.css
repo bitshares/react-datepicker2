@@ -181,23 +181,30 @@
     float: right;
 }
 
+.picker-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.save-button-container {
+    flex: 1;
+}
 
 /*time picker style*/
 
 .time-picker-container {
-    margin-bottom: 10
+    display: flex;
+    flex: 3;
 }
 
 .time-picker-container>.time-label {
-    float: left;
+    flex: 1;
     line-height: 30px;
-    width: 50%;
-    text-align: center;
+    text-align: right;
 }
 
 .time-picker-container>.time-picker-panel {
-    float: right;
-    width: 50%;
+    flex: 2;
 }
 
 .time-picker-container.jalaali>.time-label {
