@@ -69,13 +69,13 @@ export default class DatePicker extends Component {
     this.setState({ isOpen });
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.value) {
       this.setMomentValue(this.props.value, false);
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
 
     if ('value' in nextProps && nextProps.value !== this.props.value) {
       this.setMomentValue(nextProps.value);
@@ -125,12 +125,12 @@ export default class DatePicker extends Component {
     this.setOpen(true);
   }
 
-  handleBlur(event) {
+  handleBlur(ref,event) {
     const { onBlur } = this.props;
     const { isOpen, momentValue, inputFormat } = this.state;
 
     if (isOpen) {
-      this.refs.input.focus();
+      ref.current.focus();
     } else if (onBlur) {
       onBlur(event);
     }
@@ -179,7 +179,7 @@ export default class DatePicker extends Component {
     }
   }
 
-  renderInput() {
+  renderInput(ref) {
     const { isOpen, inputValue } = this.state;
 
     const className = classnames(this.props.className, {
@@ -191,9 +191,9 @@ export default class DatePicker extends Component {
         <input
           className={`datepicker-input ${className}`}
           type="text"
-          ref="input"
+          ref={ref}
           onFocus={this.handleFocus.bind(this)}
-          onBlur={this.handleBlur.bind(this)}
+          onBlur={this.handleBlur.bind(this,ref)}
           onChange={this.handleInputChange.bind(this)}
           onClick={this.handleInputClick.bind(this)}
           value={inputValue}
@@ -202,12 +202,12 @@ export default class DatePicker extends Component {
     );
   }
 
-  renderCalendar() {
+  renderCalendar(ref) {
     const { momentValue, timePickerComponent: TimePicker } = this.state;
     const { onChange, min, max, defaultMonth, styles, calendarContainerProps } = this.props;
 
     return (
-      <div>
+      <div ref={ref}>
         <Calendar
           min={min}
           max={max}
@@ -249,10 +249,10 @@ export default class DatePicker extends Component {
     const { isOpen } = this.state;
 
     return (
-      <TetherComponent className={this.props.wrapperClassName || ''} attachment={this.props.pickerPosition || 'top center'}>
-        {this.renderInput()}
-        {isOpen ? this.renderCalendar() : null}
-      </TetherComponent>
+      <TetherComponent className={this.props.wrapperClassName || ''} attachment={this.props.pickerPosition || 'top center'}
+        renderTarget={ref => this.renderInput(ref)}
+        renderElement={ref => isOpen ? this.renderCalendar(ref) : null}
+       />
     );
   }
 }

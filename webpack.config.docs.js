@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+  mode: "development",
   entry: './docs/src/boot.js',
   output: {
     path: path.resolve(__dirname, 'docs'),
@@ -9,11 +10,11 @@ module.exports = {
     library: 'react-datepicker2'
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/, query: {
-          plugins: ['transform-runtime'],
-          presets: ['es2015', 'stage-0', 'react'],
+        test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/, options: {
+          plugins: ['@babel/plugin-transform-runtime'],
+          presets: ['@babel/preset-env', '@babel/preset-react'],
         }
       }
     ]

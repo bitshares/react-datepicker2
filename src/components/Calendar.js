@@ -50,7 +50,7 @@ export class Calendar extends Component {
     };
   }
 
-  componentWillReceiveProps({ selectedDay, defaultMonth, min }) {
+  UNSAFE_componentWillReceiveProps({ selectedDay, defaultMonth, min }) {
     if (this.props.selectedDay !== selectedDay) {
       this.selectDay(selectedDay);
     } else if (defaultMonth && this.props.defaultMonth !== defaultMonth && this.state.month === this.props.defaultMonth) {

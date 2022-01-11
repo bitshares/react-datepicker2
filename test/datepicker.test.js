@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import Datepicker from '../src';
-import moment from 'moment-jalaali';
+import moment from 'moment';
 
 describe('<Datepicker />', () => {
 

@@ -55,7 +55,7 @@ const Panel = createReactClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const value = nextProps.value;
     if (value) {
       this.setState({

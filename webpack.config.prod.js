@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+  mode: "production",
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -26,11 +27,11 @@ module.exports = {
     }
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/, query: {
-          plugins: ['transform-runtime'],
-          presets: ['es2015', 'stage-0', 'react'],
+        test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/, options: {
+          plugins: ['@babel/plugin-transform-runtime'],
+          presets: ['@babel/preset-env', '@babel/preset-react'],
         }
       }
     ]

@@ -77,7 +77,7 @@ const Picker = createReactClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { value, open } = nextProps;
     if ('value' in nextProps) {
       this.setState({
